@@ -23,12 +23,13 @@
         body {
             font-family: 'Nunito', sans-serif;
             background: var(--bg-gradient);
-            height: 100vh;
+            min-height: 100vh; /* Ensure body covers full height */
             width: 100vw;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            overflow: hidden; /* Prevents scrollbars */
             position: relative;
             touch-action: none; 
         }
@@ -40,7 +41,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 0; /* Behind everything */
+            z-index: 0;
             pointer-events: none;
             overflow: hidden;
         }
@@ -52,10 +53,11 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             position: relative;
-            z-index: 10; /* Above background */
+            z-index: 10;
             width: 90%;
             max-width: 400px;
             transition: transform 0.3s ease, opacity 0.5s ease;
+            margin-bottom: 60px; /* Push card up to make room for footer */
         }
 
         h1 {
@@ -139,19 +141,41 @@
             z-index: 1;
         }
 
+        /* Mobile Adjustments */
         @media (max-width: 350px) {
             .btn { width: 100px; height: 45px; font-size: 1rem; }
             .btn-yes { margin-right: 0; }
             .btn-no { transform: translateX(60px); }
         }
 
+        /* Desktop Adjustments */
         @media (min-width: 500px) {
-            .container { padding: 3rem; width: 500px; }
+            .container { padding: 3rem; width: 500px; margin-bottom: 40px; }
             h1 { font-size: 3.5rem; }
             .cute-img { width: 150px; height: 150px; }
             .btn { font-size: 1.2rem; width: 130px; height: 55px; }
         }
 
+        /* --- Footer Styles --- */
+        .footer {
+            position: fixed; /* Fixed to bottom of viewport */
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 0.75rem;
+            color: rgba(89, 13, 34, 0.8);
+            z-index: 20; /* Higher than container and bg-hearts */
+            
+            /* Visual Enhancement */
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 8px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.5);
+            font-family: 'Nunito', sans-serif;
+            pointer-events: none; /* Let clicks pass through if needed, though fixed usually handles this */
+        }
+
+        /* Success Screen */
         .success-screen {
             display: none;
             flex-direction: column;
@@ -163,8 +187,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            /* Semi-transparent white so you can see the hearts behind it */
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.9); /* Slightly more opaque */
             backdrop-filter: blur(2px);
             z-index: 100;
             animation: fadeIn 1s ease forwards;
@@ -189,19 +212,6 @@
             color: var(--primary-color);
             animation: heartbeat 1.5s infinite;
         }
-    .site-header {
-    width: 100%;
-    padding: 20px;
-    text-align: center;
-    background-color: #111;
-    color: white;
-}
-
-.site-header h1 {
-    margin: 0;
-    font-size: 28px;
-}
-
 
         @keyframes heartbeat {
             0% { transform: scale(1); }
@@ -233,7 +243,7 @@
             z-index: 0;
             user-select: none;
             pointer-events: none;
-            bottom: -50px; /* Start below screen */
+            bottom: -50px;
         }
 
         @keyframes floatUp {
@@ -246,7 +256,6 @@
 </head>
 <body>
 
-    <!-- Background Hearts (Fixed Container) -->
     <div id="bg-hearts"></div>
 
     <div class="container" id="proposal-card">
@@ -262,14 +271,16 @@
         </div>
     </div>
 
+    <!-- Footer -->
+    <div class="footer">
+        &copy; 2026 Abhishek Bajpai. All Rights Reserved.
+    </div>
+
     <div class="success-screen" id="success-screen">
         <div class="heart-beat">❤️</div>
         <h1>She Said YES!</h1>
         <p>I'm the luckiest person in the world.</p>
     </div>
-<header class="site-header">
-    <h1>© 2026 Abhishek Bajpai. All Rights Reserved.</h1>
-</header>
 
     <script>
         const yesBtn = document.getElementById('yesBtn');
@@ -278,39 +289,31 @@
         const successScreen = document.getElementById('success-screen');
         const bgContainer = document.getElementById('bg-hearts');
 
-        // --- Create Floating Hearts Logic ---
         function createFloatingHearts() {
             const heartSymbols = ['❤️', '💖', '💕', '🌸', '💓'];
             
-            // Create a new heart every 300ms indefinitely
             setInterval(() => {
                 const heart = document.createElement('div');
                 heart.classList.add('bg-heart');
                 heart.innerHTML = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
                 
-                // Random horizontal position
                 heart.style.left = Math.random() * 100 + 'vw';
                 
-                // Random size
                 const size = Math.random() * 20 + 20;
                 heart.style.fontSize = size + 'px';
                 
-                // Random duration (speed)
-                const duration = Math.random() * 3 + 4; // 4 to 7 seconds
+                const duration = Math.random() * 3 + 4;
                 heart.style.animationDuration = duration + 's';
                 
-                // Append to body to ensure it persists even if card is hidden
                 bgContainer.appendChild(heart);
 
-                // Remove heart from DOM after animation finishes to save memory
                 setTimeout(() => {
                     heart.remove();
                 }, duration * 1000);
 
-            }, 400); // Frequency of hearts
+            }, 400);
         }
 
-        // --- Move "No" Button Logic ---
         function moveButton() {
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
@@ -332,10 +335,8 @@
             noBtn.style.transform = 'none';
         }
 
-        // Desktop Events
         noBtn.addEventListener('mouseover', moveButton);
 
-        // Mobile Events
         noBtn.addEventListener('touchstart', (e) => {
             e.preventDefault();
             moveButton();
@@ -346,7 +347,6 @@
             moveButton();
         });
 
-        // --- Yes Button Logic ---
         yesBtn.addEventListener('click', () => {
             proposalCard.style.display = 'none';
             successScreen.style.display = 'flex';
@@ -358,7 +358,6 @@
             yesBtn.click(); 
         });
 
-        // --- Confetti Logic ---
         function launchConfetti() {
             const duration = 5000;
             const end = Date.now() + duration;
@@ -385,12 +384,9 @@
             }());
         }
 
-        // Start the animation when page loads
         createFloatingHearts();
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </body>
 </html>
-
-
